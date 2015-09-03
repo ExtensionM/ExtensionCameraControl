@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import net.sh4869.extensionandroidapp.R;
+import net.sh4869.extensionandroidapp.extensionWebSocketClient;
 import net.sh4869.extensionandroidapp.message.authWebSocketMessage;
 
 import java.net.URI;
@@ -25,7 +26,7 @@ import org.java_websocket.handshake.ServerHandshake;
 public class loginActivity extends AppCompatActivity {
     private Handler mHandler;
 
-    private WebSocketClient mClient;
+    private extensionWebSocketClient mClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,33 +42,7 @@ public class loginActivity extends AppCompatActivity {
 
         try {
             URI uri = new URI("ws://ec2-52-68-77-61.ap-northeast-1.compute.amazonaws.com:3000");
-
-            mClient = new WebSocketClient(uri) {
-                @Override
-                public void onOpen(ServerHandshake handshakedata) {
-                    Log.d("MainActivity:Websocket", "onOpen");
-                }
-
-                @Override
-                public void onMessage(String message) {
-                    Log.d("MainActivity:Websocket","onMessage");
-                    Log.d("MainActivity:Websocket","Message : " + message);
-                }
-
-                @Override
-                public void onClose(int code, String reason, boolean remote) {
-                    Log.d("MainActivity:Websocket","onClose");
-                }
-
-                @Override
-                public void onError(Exception ex) {
-                    Log.d("MainActivity:WebSocket","onError");
-                    ex.printStackTrace();
-                }
-            };
-
-            mClient.connect();
-
+            mClient = new extensionWebSocketClient(uri);
         } catch (URISyntaxException e){
             e.printStackTrace();
         }
@@ -108,9 +83,7 @@ public class loginActivity extends AppCompatActivity {
             String sendText = webSocketMessage.toString();
             Log.d("MainActivity","text-send: " + sendText);
             try {
-                if(mClient.getReadyState() == WebSocket.READYSTATE.OPEN) {
-                    mClient.send(sendText);
-                }
+                mClient.messageSend(sendText);
             } catch (NotYetConnectedException e){
                 e.printStackTrace();
             } catch (IllegalStateException e){
