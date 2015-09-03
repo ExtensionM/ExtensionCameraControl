@@ -3,37 +3,37 @@ package net.sh4869.extensionandroidapp.activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import net.sh4869.extensionandroidapp.R;
-import net.sh4869.extensionandroidapp.extensionWebSocketClient;
+import net.sh4869.extensionandroidapp.message.authReturnWebSocketMessage;
 import net.sh4869.extensionandroidapp.message.authWebSocketMessage;
+import net.sh4869.extensionandroidapp.message.webSocketMessage;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.NotYetConnectedException;
-import java.util.IllegalFormatCodePointException;
 
-import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 public class loginActivity extends AppCompatActivity {
-    private Handler mHandler;
+    public static String WSTAG = "webSocket";
 
-    private extensionWebSocketClient mClient;
+    private WebSocketClient mClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        mHandler = new Handler();
         if ("sdk".equals(Build.PRODUCT)) {
             // エミュレータの場合はIPv6を無効
             java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
@@ -42,7 +42,33 @@ public class loginActivity extends AppCompatActivity {
 
         try {
             URI uri = new URI("ws://ec2-52-68-77-61.ap-northeast-1.compute.amazonaws.com:3000");
-            mClient = new extensionWebSocketClient(uri);
+            mClient = new WebSocketClient(uri) {
+                @Override
+                public void onOpen (ServerHandshake handshakedata){
+                    Log.d(WSTAG, "onOpen");
+                }
+
+                @Override
+                public void onMessage (String message){
+                    Log.d(WSTAG, "onMessage");
+                    Log.d(WSTAG, "Message : " + message);
+                    messageParser(message);
+                }
+
+                @Override
+                public void onClose ( int code, String reason,boolean remote){
+                    Log.d(WSTAG, "onClose");
+                }
+
+                @Override
+                public void onError (Exception ex){
+                    Log.d(WSTAG, "onError");
+                    ex.printStackTrace();
+                }
+            };
+
+            mClient.connect();
+
         } catch (URISyntaxException e){
             e.printStackTrace();
         }
@@ -83,7 +109,7 @@ public class loginActivity extends AppCompatActivity {
             String sendText = webSocketMessage.toString();
             Log.d("MainActivity","text-send: " + sendText);
             try {
-                mClient.messageSend(sendText);
+                mClient.send(sendText);
             } catch (NotYetConnectedException e){
                 e.printStackTrace();
             } catch (IllegalStateException e){
@@ -94,5 +120,45 @@ public class loginActivity extends AppCompatActivity {
         } else {
 
         }
+    }
+
+    private void messageParser(String message){
+        Gson gson = new Gson();
+        webSocketMessage wsMessage = gson.fromJson(message, webSocketMessage.class);
+        switch(wsMessage.type){
+            case "webAuth":
+                authReturnWebSocketMessage authReturnMessage = gson.fromJson(message,authReturnWebSocketMessage.class);
+                checkAuthResult(authReturnMessage);
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    private void checkAuthResult(authReturnWebSocketMessage authResultMessage){
+        try {
+            if (authResultMessage.authResult()) {
+                Log.d(WSTAG,"Result Success");
+                //TODO
+            }
+        } catch(IllegalStateException e){
+            e.printStackTrace();
+        }
+    }
+
+    private void saveNameAndPass(){
+        Gson gson = new Gson();
+        EditText usernameEditText = (EditText)findViewById(R.id.usernameEdit);
+        EditText passwrodEditText = (EditText)findViewById(R.id.passwordEdit);
+
+        String username = usernameEditText.getText().toString();
+        String password = passwrodEditText.getText().toString();
+
+        JsonObject jObject = new JsonObject();
+        jObject.addProperty("username",username);
+        jObject.addProperty("password",password);
+
+        String saveString = gson.toJson(jObject);
     }
 }

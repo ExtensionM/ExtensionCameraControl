@@ -22,7 +22,7 @@ public class authReturnWebSocketMessage extends baseWebSocketMessage {
     /// Return authResult
     public boolean authResult(){
         if(this.value.containsKey("result")){
-            if((int)this.value.get("result") == 0){
+            if((Double)this.value.get("result") == 0){
                 return true;
             } else {
                 return false;
