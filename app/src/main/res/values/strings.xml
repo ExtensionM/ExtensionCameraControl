@@ -1,12 +1,11 @@
 <resources>
     <string name="app_name">ExtensionAndroidApp</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="startString">Extension Android App</string>
+    <string name="title_activity_main">MainActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="loginButtonText">LOGIN</string>
-    <string name="loginMessageText">Please Login</string>
-    <string name="passwordInputHint">password</string>
-    <string name="usernameInputHint">user name</string>
-    <string name="dontEnterStringMessage">Enter password and username</string>
+    <string name="title_activity_login">loginActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 
 </resources>

@@ -1,2 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="passwordHint">password</string>
+    <string name="usernameHint">username</string>
+    <string name="login_please_message">Login Extension System</string>
+    <string name="login_button_text">LOGIN</string>
+</resources>

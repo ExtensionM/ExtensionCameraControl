@@ -1,5 +1,7 @@
 package net.sh4869.extensionandroidapp.message;
 
+import android.util.Log;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,22 +18,22 @@ public class authWebSocketMessage extends baseWebSocketMessage {
     /// Message type
     public String type = "webAuth";
     /// Message value
-    public String username,password;
+    public Map<String,String> value = new HashMap<String,String>();
 
     public authWebSocketMessage(String username,String password){
-        this.username = username;
-        this.password = password;
+        this.value.put("username",username);
+        this.value.put("password",password);
     }
 
     public String toString(){
-        JsonObject valueElement = new JsonObject();
-        valueElement.addProperty("username",username);
-        valueElement.addProperty("password",password);
-
-        JsonObject messageString = new JsonObject();
-        messageString.addProperty("type", type);
-        messageString.add("value",valueElement);
         Gson gson = new Gson();
-        return gson.toJson(messageString);
+        String messageString = "";
+        try {
+            messageString = gson.toJson(this);
+        } catch( NullPointerException e) {
+            e.printStackTrace();
+        }
+        Log.d("LOGIN",messageString);
+        return messageString;
     }
 }
