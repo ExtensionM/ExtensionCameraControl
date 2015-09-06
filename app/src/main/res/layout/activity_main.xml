@@ -1,5 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:extensionanrdoidapp="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -11,7 +13,73 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/startString"
-        android:id="@+id/textView"
+        android:id="@+id/titleTextView"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="false" />
+
+    <net.sh4869.extensionandroidapp.utility.customFontButton
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/right_button_text"
+        android:id="@+id/rightButton"
+        android:textStyle="bold"
+        android:textSize="@dimen/button_text_size"
+        extensionanrdoidapp:customFont="fontawesome-webfont.ttf"
+        android:layout_below="@+id/upButton"
+        android:layout_toRightOf="@+id/takeButton" />
+
+    <net.sh4869.extensionandroidapp.utility.customFontButton
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/left_button_text"
+        android:id="@+id/leftButton"
+        android:textStyle="bold"
+        android:textSize="@dimen/button_text_size"
+        android:layout_below="@+id/upButton"
+        extensionanrdoidapp:customFont="fontawesome-webfont.ttf"
+        android:layout_toLeftOf="@+id/upButton"
+        android:layout_toStartOf="@id/upButton" />
+
+    <net.sh4869.extensionandroidapp.utility.customFontButton
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/down_button_text"
+        android:id="@+id/downButton"
+        android:textStyle="bold"
+        android:textSize="@dimen/button_text_size"
+        android:layout_centerHorizontal="true"
+        extensionanrdoidapp:customFont="fontawesome-webfont.ttf"
+        android:layout_below="@+id/leftButton" />
+
+    <net.sh4869.extensionandroidapp.utility.customFontButton
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/up_button_text"
+        android:id="@+id/upButton"
+        android:textSize="@dimen/button_text_size"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        extensionanrdoidapp:customFont="fontawesome-webfont.ttf"
+        android:layout_alignParentStart="false"
+        android:layout_below="@+id/titleTextView" />
+
+    <net.sh4869.extensionandroidapp.utility.customFontButton
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/take_button_text"
+        android:id="@+id/takeButton"
+        android:textSize="@dimen/button_text_size"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        extensionanrdoidapp:customFont="fontawesome-webfont.ttf"
+        android:layout_alignParentStart="false"
+        android:layout_below="@+id/upButton"
+        android:layout_above="@+id/downButton" />
 </RelativeLayout>

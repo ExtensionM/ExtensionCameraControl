@@ -1,5 +1,6 @@
 package net.sh4869.extensionandroidapp.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,12 +9,22 @@ import android.view.View;
 
 import net.sh4869.extensionandroidapp.R;
 
+import java.io.File;
+
 public class MainActivity extends AppCompatActivity {
+    private String FILENAME = "userdata.json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        File file = this.getFileStreamPath(FILENAME);
+        if(file.exists()) {
+            // TODO: 2015/09/03
+        } else {
+            Intent intent = new Intent(MainActivity.this,loginActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override

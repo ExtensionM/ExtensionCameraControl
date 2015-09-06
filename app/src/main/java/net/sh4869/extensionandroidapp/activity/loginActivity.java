@@ -1,5 +1,7 @@
 package net.sh4869.extensionandroidapp.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,6 +19,9 @@ import net.sh4869.extensionandroidapp.message.authReturnWebSocketMessage;
 import net.sh4869.extensionandroidapp.message.authWebSocketMessage;
 import net.sh4869.extensionandroidapp.message.webSocketMessage;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.NotYetConnectedException;
@@ -26,6 +31,7 @@ import org.java_websocket.handshake.ServerHandshake;
 
 public class loginActivity extends AppCompatActivity {
     public static String WSTAG = "webSocket";
+    private String FILENAME = "userdata.json";
 
     private WebSocketClient mClient;
 
@@ -140,7 +146,9 @@ public class loginActivity extends AppCompatActivity {
         try {
             if (authResultMessage.authResult()) {
                 Log.d(WSTAG,"Result Success");
-                //TODO
+                saveNameAndPass();
+                Intent intent = new Intent(getApplication(),MainActivity.class);
+                startActivity(intent);
             }
         } catch(IllegalStateException e){
             e.printStackTrace();
@@ -160,5 +168,14 @@ public class loginActivity extends AppCompatActivity {
         jObject.addProperty("password",password);
 
         String saveString = gson.toJson(jObject);
+
+        FileOutputStream fileOutputStream;
+
+        try{
+            fileOutputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fileOutputStream.write(saveString.getBytes());
+        } catch (IOException e){
+            e.printStackTrace();
+        }
     }
 }
