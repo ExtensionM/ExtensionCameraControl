@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 checkAuthResult(authReturnMessage);
                 break;
             case "list":
+                checkChildListResult();
                 break;
             default:
                 break;
@@ -180,6 +181,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    // ------------------------ * Child List * -------------------------------//
+
+    /// Send Child Rist Request
+    private void sendChildListRequest(){
+        webSocketMessage wsMessage = new webSocketMessage("list",null);
+        try{
+            mClient.send(wsMessage.toString());
+        }  catch (NotYetConnectedException e){
+            e.printStackTrace();
+        } catch (IllegalStateException e){
+            e.printStackTrace();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    //// TODO: 2015/09/07
+    private void checkChildListResult(){}
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -201,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
 
 }
