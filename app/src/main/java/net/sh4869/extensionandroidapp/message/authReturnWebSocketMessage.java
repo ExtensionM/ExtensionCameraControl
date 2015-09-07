@@ -8,13 +8,12 @@ import java.util.Map;
  * Created by Nobuhiro on 2015/09/03.
  */
 public class authReturnWebSocketMessage extends baseWebSocketMessage {
-    // Message Type
-    public String type = "webAuth";
 
     // Message Value
     public Map value = new HashMap<String,Object>();
 
     public authReturnWebSocketMessage(int result,String ErrorMessage){
+        this.type = "webAuth";
         this.value.put("result",result);
         this.value.put("error",ErrorMessage);
     }

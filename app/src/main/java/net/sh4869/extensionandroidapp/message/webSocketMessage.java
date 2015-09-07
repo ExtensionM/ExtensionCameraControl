@@ -8,8 +8,7 @@ import java.util.Objects;
  * Created by Nobuhiro on 2015/09/03.
  */
 public class webSocketMessage extends baseWebSocketMessage {
-    // Json Message Type
-    public String type;
+
     // Message Value
     public Object value;
 

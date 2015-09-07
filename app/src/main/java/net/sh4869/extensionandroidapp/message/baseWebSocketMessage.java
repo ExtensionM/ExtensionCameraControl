@@ -5,6 +5,7 @@ package net.sh4869.extensionandroidapp.message;
  * Base Abstract Class Of Websoket Message
  */
 public abstract class baseWebSocketMessage {
+    public String type;
     /** convert message to String */
     public abstract String toString();
 }
