@@ -7,10 +7,13 @@ import android.os.Build;
 import android.preference.DialogPreference;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -21,6 +24,7 @@ import com.google.gson.JsonParser;
 import net.sh4869.extensionandroidapp.R;
 import net.sh4869.extensionandroidapp.message.authReturnWebSocketMessage;
 import net.sh4869.extensionandroidapp.message.authWebSocketMessage;
+import net.sh4869.extensionandroidapp.message.childListResultMessage;
 import net.sh4869.extensionandroidapp.message.webSocketMessage;
 
 import org.java_websocket.client.WebSocketClient;
@@ -33,20 +37,48 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.NotYetConnectedException;
 
+
 public class MainActivity extends AppCompatActivity {
     public static String WSTAG = "webSocket";
     private String FILENAME = "userdata.json";
+    private String LOGIN_COMPLETE_MESSAGE = "Login Complete";
 
     private WebSocketClient mClient;
+    private Handler mHandler;
+
+    public enum MessageCode {
+        Login_Success,
+        Login_fail;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mHandler = new Handler() {
+            @Override
+            public void handleMessage(Message message){
+                switch(message.what){
+                    case 0: // LOGIN SUCCESS
+                        Toast.makeText(MainActivity.this,LOGIN_COMPLETE_MESSAGE,Toast.LENGTH_SHORT).show();
+                        break;
+                    case 1: // LOGIN FAIL
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle("Error")
+                                .setMessage("message: " + (String)message.obj)
+                                .setPositiveButton("OK", errorDialogButton)
+                                .show();
+                        break;
+                    case 2:
+                        break;
+                }
+            }
+        };
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         File file = this.getFileStreamPath(FILENAME);
         if(file.exists()) {
             if ("sdk".equals(Build.PRODUCT)) {
-                // エミュレータの場合�?�IPv6を無効
+                // エミュレータの場合はIPv6を無効
                 java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
                 java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
             }
@@ -93,18 +125,31 @@ public class MainActivity extends AppCompatActivity {
     private void messageParser(String message){
         Gson gson = new Gson();
         webSocketMessage wsMessage = gson.fromJson(message, webSocketMessage.class);
-        switch(wsMessage.type){
-            case "webAuth":
-                authReturnWebSocketMessage authReturnMessage = gson.fromJson(message,authReturnWebSocketMessage.class);
-                checkAuthResult(authReturnMessage);
-                break;
-            case "list":
-                checkChildListResult();
-                break;
-            default:
-                break;
+        try {
+            switch (wsMessage.type) {
+                case "webAuth":
+                    authReturnWebSocketMessage authReturnMessage = gson.fromJson(message, authReturnWebSocketMessage.class);
+                    checkAuthResult(authReturnMessage);
+                    break;
+                case "list":
+                    childListResultMessage childMessage = new childListResultMessage(message);
+                    checkChildListResult();
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
+
+    /// Onclick Lisnter for Dialog
+    DialogInterface.OnClickListener errorDialogButton = new DialogInterface.OnClickListener(){
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            callLoginAcitivty();
+        }
+    };
 
     private void callLoginAcitivty(){
         Intent intent = new Intent(getApplication(),loginActivity.class);
@@ -130,8 +175,8 @@ public class MainActivity extends AppCompatActivity {
                 JsonElement userDataElement = parser.parse(userDataStr);
                 JsonObject userDataObject = userDataElement.getAsJsonObject();
 
-                String username = userDataObject.get("username").toString();
-                String password = userDataObject.get("password").toString();
+                String username = userDataObject.get("username").toString().replace("\"", "");
+                String password = userDataObject.get("password").toString().replace("\"","");
                 authWebSocketMessage authWSMessage = new authWebSocketMessage(username,password);
                 try {
                     mClient.send(authWSMessage.toString());
@@ -154,13 +199,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /// Onclick Lisnter for Dialog
-    DialogInterface.OnClickListener errorDialogButton = new DialogInterface.OnClickListener(){
-        @Override
-        public void onClick(DialogInterface dialog, int which){
-           callLoginAcitivty();
-        }
-    };
+
 
     /// Check Result of Login
     private void checkAuthResult(authReturnWebSocketMessage authResultMessage){
@@ -168,17 +207,23 @@ public class MainActivity extends AppCompatActivity {
             if (authResultMessage.authResult()) {
                 Log.d(WSTAG, "Result Success");
                 sendChildListRequest();
+                Message resultMessage = createMessage(LOGIN_COMPLETE_MESSAGE,MessageCode.Login_Success.ordinal());
+                mHandler.sendMessage(resultMessage);
             } else {
                 Log.d(WSTAG, "Auth Result Fail");
-                new AlertDialog.Builder(this)
-                        .setTitle("Error")
-                        .setMessage("message: " + authResultMessage.getErrorMessage())
-                        .setPositiveButton("OK", errorDialogButton)
-                        .show();
+                Message resultMessage = createMessage(authResultMessage.getErrorMessage(),MessageCode.Login_fail.ordinal());
+                mHandler.sendMessage(resultMessage);
             }
         } catch(IllegalStateException e){
             e.printStackTrace();
         }
+    }
+
+    Message createMessage(String messageObj,int whatCode){
+        Message message = Message.obtain();
+        message.obj = messageObj;
+        message.what = whatCode;
+        return message;
     }
 
 
