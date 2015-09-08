@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 /**
  * Created by Nobuhiro on 2015/09/08.
  */
-public class childrenFunctionArg {
+public class ExChildFunctionArg {
     // Arg Name
     public String arg;
 

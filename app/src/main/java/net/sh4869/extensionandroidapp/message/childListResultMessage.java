@@ -8,19 +8,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 
-import net.sh4869.extensionandroidapp.activity.MainActivity;
-import net.sh4869.extensionandroidapp.message.childs.childrenInfo;
-import net.sh4869.extensionandroidapp.message.childs.extensionChildren;
+import net.sh4869.extensionandroidapp.message.childs.ExChildren;
 
-import org.json.JSONException;
-
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -58,7 +50,7 @@ public class childListResultMessage extends baseWebSocketMessage {
                 JsonObject finalJsonObject = new JsonObject();
                 finalJsonObject.add("commands", fixedCommandsObject);
                 try {
-                    extensionChildren exChildren = gson.fromJson(finalJsonObject, extensionChildren.class);
+                    ExChildren exChildren = gson.fromJson(finalJsonObject, ExChildren.class);
                     this.value.putAll(exChildren.commands);
                 } catch (NullPointerException e) {
                     e.printStackTrace();

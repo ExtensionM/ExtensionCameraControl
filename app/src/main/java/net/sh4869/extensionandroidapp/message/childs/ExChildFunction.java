@@ -1,16 +1,14 @@
 package net.sh4869.extensionandroidapp.message.childs;
 
-import com.google.gson.annotations.Expose;
-
 import java.util.List;
 
 /**
  * Created by Nobuhiro on 2015/09/08.
  */
-public class childrenFunctionInfo {
+public class ExChildFunction {
 
     /// Args of this function
-    public List<childrenFunctionArg> args;
+    public List<ExChildFunctionArg> args;
 
     /// Description of Function
     public String desc;
@@ -33,6 +31,6 @@ public class childrenFunctionInfo {
     public boolean sync;
 
     /// Result of this Funtion
-    public childrenFunctionArg result;
+    public ExChildFunctionArg result;
 
 }
