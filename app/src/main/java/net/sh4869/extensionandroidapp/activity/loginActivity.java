@@ -15,15 +15,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import net.sh4869.extensionandroidapp.R;
-import net.sh4869.extensionandroidapp.message.ExAuthResultWebSocketMessage;
-import net.sh4869.extensionandroidapp.message.ExAuthWebSocketMessage;
-import net.sh4869.extensionandroidapp.message.ExWebSocketMessage;
+import net.sh4869.extensionandroidapp.websokcetdata.ExAuthResultWebSocketMessage;
+import net.sh4869.extensionandroidapp.websokcetdata.ExAuthWebSocketMessage;
+import net.sh4869.extensionandroidapp.websokcetdata.ExWebSocketMessage;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.channels.NotYetConnectedException;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;

@@ -1,4 +1,4 @@
-package net.sh4869.extensionandroidapp.message;
+package net.sh4869.extensionandroidapp.websokcetdata;
 
 /**
  * Created by Nobuhiro on 2015/08/28.

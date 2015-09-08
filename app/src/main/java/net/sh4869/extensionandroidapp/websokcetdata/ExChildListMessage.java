@@ -1,4 +1,4 @@
-package net.sh4869.extensionandroidapp.message;
+package net.sh4869.extensionandroidapp.websokcetdata;
 
 import android.util.Log;
 
@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import net.sh4869.extensionandroidapp.message.ExChild.ExChildren;
+import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildren;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class ExChildListMessage extends ExBaseWebSocketMessage {
         try {
             JsonObject valueObject = parser.parse(message).getAsJsonObject().getAsJsonObject("value");
             this.value.put("result", valueObject.get("result").getAsInt());
-            if (this.value.get("result") == 0) {
+            if (((int)this.value.get("result")) == 0) {
                 JsonObject commandsObject = valueObject.get("commands").getAsJsonObject();
                 Set<Map.Entry<String, JsonElement>> entrySet = commandsObject.entrySet();
                 JsonObject fixedCommandsObject = new JsonObject();
@@ -51,7 +51,8 @@ public class ExChildListMessage extends ExBaseWebSocketMessage {
                 finalJsonObject.add("commands", fixedCommandsObject);
                 try {
                     ExChildren exChildren = gson.fromJson(finalJsonObject, ExChildren.class);
-                    this.value.putAll(exChildren.commands);
+                    this.value.put("commands",exChildren.commands);
+                    Log.d("JsonParse", gson.toJson(this, ExChildListMessage.class));
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }

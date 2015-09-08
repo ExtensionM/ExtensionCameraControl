@@ -20,10 +20,12 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import net.sh4869.extensionandroidapp.R;
-import net.sh4869.extensionandroidapp.message.ExAuthResultWebSocketMessage;
-import net.sh4869.extensionandroidapp.message.ExAuthWebSocketMessage;
-import net.sh4869.extensionandroidapp.message.ExChildListMessage;
-import net.sh4869.extensionandroidapp.message.ExWebSocketMessage;
+import net.sh4869.extensionandroidapp.websokcetdata.ExAuthResultWebSocketMessage;
+import net.sh4869.extensionandroidapp.websokcetdata.ExAuthWebSocketMessage;
+import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildFinder;
+import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildren;
+import net.sh4869.extensionandroidapp.websokcetdata.ExChildListMessage;
+import net.sh4869.extensionandroidapp.websokcetdata.ExWebSocketMessage;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;

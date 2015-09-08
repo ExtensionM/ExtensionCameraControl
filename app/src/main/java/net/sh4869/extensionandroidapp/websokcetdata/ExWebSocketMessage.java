@@ -1,4 +1,4 @@
-package net.sh4869.extensionandroidapp.message;
+package net.sh4869.extensionandroidapp.websokcetdata;
 
 import com.google.gson.Gson;
 

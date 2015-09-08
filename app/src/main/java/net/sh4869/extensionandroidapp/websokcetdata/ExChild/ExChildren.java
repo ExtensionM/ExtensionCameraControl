@@ -1,4 +1,4 @@
-package net.sh4869.extensionandroidapp.message.ExChild;
+package net.sh4869.extensionandroidapp.websokcetdata.ExChild;
 
 import java.util.Iterator;
 import java.util.Map;
