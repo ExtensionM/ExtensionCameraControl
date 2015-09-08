@@ -1,18 +1,17 @@
 package net.sh4869.extensionandroidapp.message;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by Nobuhiro on 2015/09/03.
  */
-public class authReturnWebSocketMessage extends baseWebSocketMessage {
+public class ExAuthResultWebSocketMessage extends ExBaseWebSocketMessage {
 
     // Message Value
     public Map value = new HashMap<String,Object>();
 
-    public authReturnWebSocketMessage(int result,String ErrorMessage){
+    public ExAuthResultWebSocketMessage(int result, String ErrorMessage){
         this.type = "webAuth";
         this.value.put("result",result);
         this.value.put("error",ErrorMessage);

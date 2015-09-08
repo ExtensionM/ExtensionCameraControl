@@ -18,11 +18,11 @@ import java.util.Set;
 /**
  * Created by Nobuhiro on 2015/09/08.
  */
-public class childListResultMessage extends baseWebSocketMessage {
+public class ExChildListMessage extends ExBaseWebSocketMessage {
 
     public Map<String, Object> value = new HashMap<>();
 
-    public childListResultMessage(String message) {
+    public ExChildListMessage(String message) {
         this.type = "list";
 
         JsonParser parser = new JsonParser();

@@ -15,13 +15,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import net.sh4869.extensionandroidapp.R;
-import net.sh4869.extensionandroidapp.message.authReturnWebSocketMessage;
-import net.sh4869.extensionandroidapp.message.authWebSocketMessage;
-import net.sh4869.extensionandroidapp.message.webSocketMessage;
+import net.sh4869.extensionandroidapp.message.ExAuthResultWebSocketMessage;
+import net.sh4869.extensionandroidapp.message.ExAuthWebSocketMessage;
+import net.sh4869.extensionandroidapp.message.ExWebSocketMessage;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.NotYetConnectedException;
@@ -29,7 +28,7 @@ import java.nio.channels.NotYetConnectedException;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
-public class loginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
     public static String WSTAG = "webSocket";
     private String FILENAME = "userdata.json";
 
@@ -111,7 +110,7 @@ public class loginActivity extends AppCompatActivity {
         String password = passwrodEditText.getText().toString();
         if(username != " " && password != " ") {
 
-            authWebSocketMessage webSocketMessage = new authWebSocketMessage(username,password);
+            ExAuthWebSocketMessage webSocketMessage = new ExAuthWebSocketMessage(username,password);
             String sendText = webSocketMessage.toString();
             Log.d("MainActivity","text-send: " + sendText);
             try {
@@ -130,10 +129,10 @@ public class loginActivity extends AppCompatActivity {
 
     private void messageParser(String message){
         Gson gson = new Gson();
-        webSocketMessage wsMessage = gson.fromJson(message, webSocketMessage.class);
+        ExWebSocketMessage wsMessage = gson.fromJson(message, ExWebSocketMessage.class);
         switch(wsMessage.type){
             case "webAuth":
-                authReturnWebSocketMessage authReturnMessage = gson.fromJson(message,authReturnWebSocketMessage.class);
+                ExAuthResultWebSocketMessage authReturnMessage = gson.fromJson(message,ExAuthResultWebSocketMessage.class);
                 checkAuthResult(authReturnMessage);
                 break;
             default:
@@ -142,7 +141,7 @@ public class loginActivity extends AppCompatActivity {
     }
 
 
-    private void checkAuthResult(authReturnWebSocketMessage authResultMessage){
+    private void checkAuthResult(ExAuthResultWebSocketMessage authResultMessage){
         try {
             if (authResultMessage.authResult()) {
                 Log.d(WSTAG,"Result Success");

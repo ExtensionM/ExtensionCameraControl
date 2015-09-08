@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
-import android.preference.DialogPreference;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,7 +11,6 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -22,10 +20,10 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import net.sh4869.extensionandroidapp.R;
-import net.sh4869.extensionandroidapp.message.authReturnWebSocketMessage;
-import net.sh4869.extensionandroidapp.message.authWebSocketMessage;
-import net.sh4869.extensionandroidapp.message.childListResultMessage;
-import net.sh4869.extensionandroidapp.message.webSocketMessage;
+import net.sh4869.extensionandroidapp.message.ExAuthResultWebSocketMessage;
+import net.sh4869.extensionandroidapp.message.ExAuthWebSocketMessage;
+import net.sh4869.extensionandroidapp.message.ExChildListMessage;
+import net.sh4869.extensionandroidapp.message.ExWebSocketMessage;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -117,22 +115,22 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         } else {
-            Intent intent = new Intent(MainActivity.this,loginActivity.class);
+            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
             startActivity(intent);
         }
     }
 
     private void messageParser(String message){
         Gson gson = new Gson();
-        webSocketMessage wsMessage = gson.fromJson(message, webSocketMessage.class);
+        ExWebSocketMessage wsMessage = gson.fromJson(message, ExWebSocketMessage.class);
         try {
             switch (wsMessage.type) {
                 case "webAuth":
-                    authReturnWebSocketMessage authReturnMessage = gson.fromJson(message, authReturnWebSocketMessage.class);
+                    ExAuthResultWebSocketMessage authReturnMessage = gson.fromJson(message, ExAuthResultWebSocketMessage.class);
                     checkAuthResult(authReturnMessage);
                     break;
                 case "list":
-                    childListResultMessage childMessage = new childListResultMessage(message);
+                    ExChildListMessage childMessage = new ExChildListMessage(message);
                     checkChildListResult();
                     break;
                 default:
@@ -152,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void callLoginAcitivty(){
-        Intent intent = new Intent(getApplication(),loginActivity.class);
+        Intent intent = new Intent(getApplication(),LoginActivity.class);
         startActivity(intent);
     }
 
@@ -177,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
                 String username = userDataObject.get("username").toString().replace("\"", "");
                 String password = userDataObject.get("password").toString().replace("\"","");
-                authWebSocketMessage authWSMessage = new authWebSocketMessage(username,password);
+                ExAuthWebSocketMessage authWSMessage = new ExAuthWebSocketMessage(username,password);
                 try {
                     mClient.send(authWSMessage.toString());
                 } catch(NotYetConnectedException e){
@@ -202,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /// Check Result of Login
-    private void checkAuthResult(authReturnWebSocketMessage authResultMessage){
+    private void checkAuthResult(ExAuthResultWebSocketMessage authResultMessage){
         try {
             if (authResultMessage.authResult()) {
                 Log.d(WSTAG, "Result Success");
@@ -231,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
 
     /// Send Child Rist Request
     private void sendChildListRequest(){
-        webSocketMessage wsMessage = new webSocketMessage("list",null);
+        ExWebSocketMessage wsMessage = new ExWebSocketMessage("list",null);
         try{
             mClient.send(wsMessage.toString());
         }  catch (NotYetConnectedException e){

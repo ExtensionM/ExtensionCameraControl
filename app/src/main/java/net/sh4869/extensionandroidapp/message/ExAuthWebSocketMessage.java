@@ -6,19 +6,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import org.json.JSONObject;
 
 /**
  * Created by Nobuhiro on 2015/08/28.
  */
-public class authWebSocketMessage extends baseWebSocketMessage {
+public class ExAuthWebSocketMessage extends ExBaseWebSocketMessage {
     /// Message value
     public Map<String,String> value = new HashMap<String,String>();
 
-    public authWebSocketMessage(String username,String password){
+    public ExAuthWebSocketMessage(String username, String password){
         this.type = "webAuth";
         this.value.put("username",username);
         this.value.put("password",password);
