@@ -20,6 +20,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import net.sh4869.extensionandroidapp.R;
+import net.sh4869.extensionandroidapp.message.HandlerMessageCodeEnum;
 import net.sh4869.extensionandroidapp.websokcetdata.ExAuthResultWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExAuthWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildFinder;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             public void handleMessage(Message message){
                 switch(message.what){
                     case 0: // LOGIN SUCCESS
-                        Toast.makeText(MainActivity.this,LOGIN_COMPLETE_MESSAGE,Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this,getResources().getString(R.string.login_success),Toast.LENGTH_SHORT).show();
                         break;
                     case 1: // LOGIN FAIL
                         new AlertDialog.Builder(MainActivity.this)
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case "list":
                     ExChildListMessage childMessage = new ExChildListMessage(message);
-                    checkChildListResult();
+                    checkChildListResult(childMessage);
                     break;
                 default:
                     break;
@@ -207,11 +208,11 @@ public class MainActivity extends AppCompatActivity {
             if (authResultMessage.authResult()) {
                 Log.d(WSTAG, "Result Success");
                 sendChildListRequest();
-                Message resultMessage = createMessage(LOGIN_COMPLETE_MESSAGE,MessageCode.Login_Success.ordinal());
+                Message resultMessage = createMessage(LOGIN_COMPLETE_MESSAGE, HandlerMessageCodeEnum.LOGIN_SUCCESS.ordinal());
                 mHandler.sendMessage(resultMessage);
             } else {
                 Log.d(WSTAG, "Auth Result Fail");
-                Message resultMessage = createMessage(authResultMessage.getErrorMessage(),MessageCode.Login_fail.ordinal());
+                Message resultMessage = createMessage(authResultMessage.getErrorMessage(),HandlerMessageCodeEnum.LOGIN_FAILED.ordinal());
                 mHandler.sendMessage(resultMessage);
             }
         } catch(IllegalStateException e){
@@ -241,7 +242,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     //// TODO: 2015/09/07
-    private void checkChildListResult(){}
+    private void checkChildListResult(ExChildListMessage message){
+        ExChildren children = ExChildFinder.searchChildren(message,"Camera");
+        if(children.commands.size() == 1){
+
+        }
+    }
 
 
     @Override
