@@ -19,7 +19,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="false" />
 
-    <net.sh4869.extensionandroidapp.utility.customFontButton
+    <net.sh4869.extensionandroidapp.view.customFontButton
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
         android:layout_below="@+id/upButton"
         android:layout_toRightOf="@+id/takeButton" />
 
-    <net.sh4869.extensionandroidapp.utility.customFontButton
+    <net.sh4869.extensionandroidapp.view.customFontButton
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
         android:layout_toLeftOf="@+id/upButton"
         android:layout_toStartOf="@id/upButton" />
 
-    <net.sh4869.extensionandroidapp.utility.customFontButton
+    <net.sh4869.extensionandroidapp.view.customFontButton
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
         extensionanrdoidapp:customFont="fontawesome-webfont.ttf"
         android:layout_below="@+id/leftButton" />
 
-    <net.sh4869.extensionandroidapp.utility.customFontButton
+    <net.sh4869.extensionandroidapp.view.customFontButton
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
         android:layout_alignParentStart="false"
         android:layout_below="@+id/titleTextView" />
 
-    <net.sh4869.extensionandroidapp.utility.customFontButton
+    <net.sh4869.extensionandroidapp.view.customFontButton
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

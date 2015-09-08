@@ -232,11 +232,7 @@ public class MainActivity extends AppCompatActivity {
         ExWebSocketMessage wsMessage = new ExWebSocketMessage("list",null);
         try{
             mClient.send(wsMessage.toString());
-        }  catch (NotYetConnectedException e){
-            e.printStackTrace();
         } catch (IllegalStateException e){
-            e.printStackTrace();
-        } catch (Exception e){
             e.printStackTrace();
         }
     }

@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import net.sh4869.extensionandroidapp.message.childs.ExChildren;
+import net.sh4869.extensionandroidapp.message.ExChild.ExChildren;
 
 import java.util.HashMap;
 import java.util.Map;

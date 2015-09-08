@@ -1,4 +1,4 @@
-package net.sh4869.extensionandroidapp.message.childs;
+package net.sh4869.extensionandroidapp.message.ExChild;
 
 import net.sh4869.extensionandroidapp.utility.IterableMap;
 

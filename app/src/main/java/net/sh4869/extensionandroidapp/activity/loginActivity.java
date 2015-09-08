@@ -115,11 +115,7 @@ public class LoginActivity extends AppCompatActivity {
             Log.d("MainActivity","text-send: " + sendText);
             try {
                 mClient.send(sendText);
-            } catch (NotYetConnectedException e){
-                e.printStackTrace();
-            } catch (IllegalStateException e){
-                e.printStackTrace();
-            } catch (Exception e){
+             } catch (IllegalStateException e){
                 e.printStackTrace();
             }
         } else {

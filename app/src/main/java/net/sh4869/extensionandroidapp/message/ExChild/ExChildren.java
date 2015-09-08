@@ -1,4 +1,4 @@
-package net.sh4869.extensionandroidapp.message.childs;
+package net.sh4869.extensionandroidapp.message.ExChild;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -12,6 +12,10 @@ public class ExChildren implements IterableMap<String,ExChild> {
 
     /// Map of GUID String and ExChild Class
     public Map<String,ExChild> commands;
+
+    public ExChildren(Map<String,ExChild> commands)  {
+        this.commands = commands;
+    }
 
     @Override
     public Iterator<Map.Entry<String,ExChild>> iterator(){

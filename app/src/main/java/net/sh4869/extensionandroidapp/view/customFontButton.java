@@ -1,4 +1,4 @@
-package net.sh4869.extensionandroidapp.utility;
+package net.sh4869.extensionandroidapp.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,6 +9,7 @@ import android.widget.Button;
 
 import net.sh4869.extensionandroidapp.R;
 import net.sh4869.extensionandroidapp.utility.CachedTypefaces;
+
 /**
  * Created by Nobuhiro on 2015/09/06.
  */
