@@ -34,42 +34,37 @@ public class childListResultMessage extends baseWebSocketMessage {
         this.type = "list";
 
         JsonParser parser = new JsonParser();
-        try {
-            JsonObject messageObject = parser.parse(message).getAsJsonObject();
-            JsonObject valueObject = messageObject.getAsJsonObject("value");
 
+        try {
+            JsonObject valueObject = parser.parse(message).getAsJsonObject().getAsJsonObject("value");
             this.value.put("result", valueObject.get("result").getAsInt());
-            if (valueObject.get("result").getAsInt() == 0) {
+            if (this.value.get("result") == 0) {
                 JsonObject commandsObject = valueObject.get("commands").getAsJsonObject();
                 Set<Map.Entry<String, JsonElement>> entrySet = commandsObject.entrySet();
                 JsonObject fixedCommandsObject = new JsonObject();
 
-                GsonBuilder gBuilder = new GsonBuilder().serializeNulls();
-                Gson gson = gBuilder.create();
-
-                for (Map.Entry<String, ?> entry : entrySet) {
-                    if (entry.getValue() instanceof JsonElement) {
-                        if (((JsonElement) entry.getValue()).isJsonObject()) {
-                            if(( (JsonElement) entry.getValue()).getAsJsonObject().has("name")){
-                                fixedCommandsObject.add(entry.getKey(),(JsonElement)entry.getValue());
-                                Log.d("JsonParse", gson.toJson(gson.fromJson((JsonElement) entry.getValue(),childrenInfo.class),childrenInfo.class));
-                            }
+                Gson gson = new GsonBuilder().serializeNulls().create();
+                /// Check Each Map<String,JsonElement> Object - whether or not it have "name" key
+                for (Map.Entry<String, JsonElement> entry : entrySet) {
+                    try {
+                        if (entry.getValue().getAsJsonObject().has("name")) {
+                            fixedCommandsObject.add(entry.getKey(),entry.getValue());
                         }
+                    } catch (IllegalStateException e) {
+                        /// Reomve Object that don't have name or can't get as JsonObject
+                        Log.d("ChildList", "Remove error json object : " + entry.getKey());
                     }
                 }
-
                 JsonObject finalJsonObject = new JsonObject();
-                finalJsonObject.add("commands",fixedCommandsObject);
+                finalJsonObject.add("commands", fixedCommandsObject);
                 try {
                     extensionChildren exChildren = gson.fromJson(finalJsonObject, extensionChildren.class);
-                    Log.d("JsonParse",gson.toJson(finalJsonObject));
-                    Log.d("JsonParse",gson.toJson(exChildren,extensionChildren.class));
                     this.value.putAll(exChildren.commands);
-                } catch (JsonSyntaxException e) {
+                } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
             } else {
-
+                this.value.put("error",valueObject.get("error").getAsString());
             }
         } catch (JsonParseException e) {
             Log.d("JsonParse", e.getMessage());
