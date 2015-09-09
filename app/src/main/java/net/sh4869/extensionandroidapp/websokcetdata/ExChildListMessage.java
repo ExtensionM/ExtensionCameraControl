@@ -51,8 +51,7 @@ public class ExChildListMessage extends ExBaseWebSocketMessage {
                 finalJsonObject.add("commands", fixedCommandsObject);
                 try {
                     ExChildren exChildren = gson.fromJson(finalJsonObject, ExChildren.class);
-                    this.value.put("commands",exChildren.commands);
-                    Log.d("JsonParse", gson.toJson(this, ExChildListMessage.class));
+                    this.value.put("commands",exChildren);
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
