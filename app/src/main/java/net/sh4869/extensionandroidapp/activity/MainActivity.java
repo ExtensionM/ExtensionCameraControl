@@ -20,8 +20,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import net.sh4869.extensionandroidapp.R;
-import net.sh4869.extensionandroidapp.message.HandlerMessageCodeEnum;
-import net.sh4869.extensionandroidapp.utility.DirectionEnum;
+import net.sh4869.extensionandroidapp.message.HandlerMessage;
+import net.sh4869.extensionandroidapp.utility.Direction;
 import net.sh4869.extensionandroidapp.websokcetdata.ExAuthResultWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExAuthWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExCallResultWebSocketMessage;
@@ -30,6 +30,7 @@ import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChild;
 import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildFinder;
 import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildren;
 import net.sh4869.extensionandroidapp.websokcetdata.ExChildListMessage;
+import net.sh4869.extensionandroidapp.websokcetdata.ExFunctionResultWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExWebSocketMessage;
 
 import org.java_websocket.client.WebSocketClient;
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
-                switch ((HandlerMessageCodeEnum) message.obj) {
+                switch ((HandlerMessage) message.obj) {
                     case LOGIN_SUCCESS: // LOGIN SUCCESS
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.login_success), Toast.LENGTH_SHORT).show();
                         break;
@@ -98,6 +99,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(ACTIVITY_TAG, getResources().getString(R.string.fail_to_call_function));
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.fail_to_call_function), Toast.LENGTH_SHORT).show();
                         break;
+                    case FUNCTION_FAIL:
+                        Log.d(ACTIVITY_TAG, getResources().getString(R.string.fail_to_complete_function));
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.fail_to_call_function), Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -167,6 +171,10 @@ public class MainActivity extends AppCompatActivity {
                     ExCallResultWebSocketMessage callResultMessage = new ExCallResultWebSocketMessage(message);
                     checkCallResult(callResultMessage);
                     break;
+                case "result":
+                    ExFunctionResultWebSocketMessage functionResultMessage = new ExFunctionResultWebSocketMessage(message);
+                    checkFunctionResult(functionResultMessage);
+                    break;
                 default:
                     break;
             }
@@ -188,6 +196,13 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    Message createMessage(HandlerMessage messageCode, int whatCode) {
+        Message message = Message.obtain();
+        message.obj = messageCode;
+        message.what = whatCode;
+        return message;
+    }
+
     // ----------------------- * Web Auth * --------------------------------//
 
     /// Send Login Request Method
@@ -204,18 +219,12 @@ public class MainActivity extends AppCompatActivity {
             /// Create UserData Json
             JsonParser parser = new JsonParser();
             try {
-                JsonElement userDataElement = parser.parse(userDataStr);
-                JsonObject userDataObject = userDataElement.getAsJsonObject();
-
+                JsonObject userDataObject = parser.parse(userDataStr).getAsJsonObject();
                 String username = userDataObject.get("username").toString().replace("\"", "");
                 String password = userDataObject.get("password").toString().replace("\"", "");
                 ExAuthWebSocketMessage authWSMessage = new ExAuthWebSocketMessage(username, password);
-                try {
-                    mClient.send(authWSMessage.toString());
-                } catch (NotYetConnectedException e) {
-                    e.printStackTrace();
-                }
-            } catch (IllegalStateException e) {
+                mClient.send(authWSMessage.toString());
+            } catch (JsonParseException e) {
                 e.printStackTrace();
                 sendsuccess = false;
             }
@@ -231,27 +240,16 @@ public class MainActivity extends AppCompatActivity {
 
     /// Check Result of Login
     private void checkAuthResult(ExAuthResultWebSocketMessage authResultMessage) {
-        try {
-            if (authResultMessage.authResult()) {
-                Log.d(WSTAG, "Result Success");
-                sendChildListRequest();
-                Message resultMessage = createMessage(HandlerMessageCodeEnum.LOGIN_SUCCESS, HandlerMessageCodeEnum.LOGIN_SUCCESS.codeNumber());
-                mHandler.sendMessage(resultMessage);
-            } else {
-                Log.d(WSTAG, "Auth Result Fail");
-                Message resultMessage = createMessage(HandlerMessageCodeEnum.LOGIN_FAILED, HandlerMessageCodeEnum.LOGIN_FAILED.codeNumber());
-                mHandler.sendMessage(resultMessage);
-            }
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
+        if (authResultMessage.authResult()) {
+            Log.d(WSTAG, "Result Success");
+            sendChildListRequest();
+            Message resultMessage = createMessage(HandlerMessage.LOGIN_SUCCESS, HandlerMessage.LOGIN_SUCCESS.codeNumber());
+            mHandler.sendMessage(resultMessage);
+        } else {
+            Log.d(WSTAG, "Auth Result Fail");
+            Message resultMessage = createMessage(HandlerMessage.LOGIN_FAILED, HandlerMessage.LOGIN_FAILED.codeNumber());
+            mHandler.sendMessage(resultMessage);
         }
-    }
-
-    Message createMessage(HandlerMessageCodeEnum messageCode, int whatCode) {
-        Message message = Message.obtain();
-        message.obj = messageCode;
-        message.what = whatCode;
-        return message;
     }
 
 
@@ -276,14 +274,14 @@ public class MainActivity extends AppCompatActivity {
         Message messageData;
         switch (guidList.size()) {
             case 1:
-                messageData = createMessage(HandlerMessageCodeEnum.CHILD_FOUND, HandlerMessageCodeEnum.CHILD_FOUND.codeNumber());
+                messageData = createMessage(HandlerMessage.CHILD_FOUND, HandlerMessage.CHILD_FOUND.codeNumber());
                 cameraChildGUID = guidList.get(guidList.size() - 1);
                 break;
             case 0:
-                messageData = createMessage(HandlerMessageCodeEnum.CHILD_NOT_FOUND, HandlerMessageCodeEnum.CHILD_NOT_FOUND.codeNumber());
+                messageData = createMessage(HandlerMessage.CHILD_NOT_FOUND, HandlerMessage.CHILD_NOT_FOUND.codeNumber());
                 break;
             default:
-                messageData = createMessage(HandlerMessageCodeEnum.CHILD_FOUND_MULTIPLE, HandlerMessageCodeEnum.CHILD_FOUND_MULTIPLE.codeNumber());
+                messageData = createMessage(HandlerMessage.CHILD_FOUND_MULTIPLE, HandlerMessage.CHILD_FOUND_MULTIPLE.codeNumber());
 
         }
         mHandler.sendMessage(messageData);
@@ -297,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
      * @param direction direction
      * @param value     angle value
      */
-    public void sendCameraServoMove(DirectionEnum direction, int value) {
+    public void sendCameraServoMove(Direction direction, int value) {
         String funcName = "";
         int angle = 90;
         switch (direction) {
@@ -337,12 +335,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkCallResult(ExCallResultWebSocketMessage message) {
         if (!message.getCallResult()) {
-            Message sendHndleMessage = createMessage(HandlerMessageCodeEnum.CALL_FAIL, HandlerMessageCodeEnum.CALL_FAIL.codeNumber());
+            Message sendHndleMessage = createMessage(HandlerMessage.CALL_FAIL, HandlerMessage.CALL_FAIL.codeNumber());
             mHandler.sendMessage(sendHndleMessage);
         }
     }
 
     // ------------------------ Check Result of Function --------------------
+
+    private void checkFunctionResult(ExFunctionResultWebSocketMessage message) {
+        if (message.value.hasError) {
+            Message handlerMessage = createMessage(HandlerMessage.FUNCTION_FAIL, HandlerMessage.FUNCTION_FAIL.codeNumber());
+            mHandler.sendMessage(handlerMessage);
+        }
+    }
 
 
     @Override

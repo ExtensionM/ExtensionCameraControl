@@ -6,4 +6,5 @@
     <string name="child_not_found">Not Found Camera Child</string>
     <string name="child_found_multiple">Found Camera Children</string>
     <string name="fail_to_call_function">Fail to Call Function</string>
+    <string name="fail_to_complete_function">Fail to complete Function</string>
 </resources>
