@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * Created by Nobuhiro on 2015/08/28.
@@ -21,14 +22,7 @@ public class ExAuthWebSocketMessage extends ExBaseWebSocketMessage {
     }
 
     public String toString(){
-        Gson gson = new Gson();
-        String messageString = "";
-        try {
-            messageString = gson.toJson(this);
-        } catch( NullPointerException e) {
-            e.printStackTrace();
-        }
-        Log.d("LOGIN",messageString);
-        return messageString;
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        return gson.toJson(this);
     }
 }

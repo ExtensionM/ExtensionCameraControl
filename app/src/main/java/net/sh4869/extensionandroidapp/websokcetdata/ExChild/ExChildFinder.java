@@ -1,7 +1,5 @@
 package net.sh4869.extensionandroidapp.websokcetdata.ExChild;
 
-import android.util.Log;
-
 import net.sh4869.extensionandroidapp.websokcetdata.ExChildListMessage;
 
 import java.util.HashMap;
@@ -17,7 +15,6 @@ public class ExChildFinder {
         ExChildren sourceChildren = (ExChildren) message.value.get("commands");
         for (Map.Entry<String, ExChild> childMap : sourceChildren) {
             ExChild child = childMap.getValue();
-            Log.d("CHILDREN_FINDER","Name : " + child.name);
             if (child.name.equals(FindChildName)) {
                 // You can't use putAll because
                 childrenMap.put(childMap.getKey(), childMap.getValue());
