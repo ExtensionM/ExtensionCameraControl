@@ -11,10 +11,10 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
@@ -22,6 +22,7 @@ import com.google.gson.JsonParser;
 import net.sh4869.extensionandroidapp.R;
 import net.sh4869.extensionandroidapp.message.HandlerMessage;
 import net.sh4869.extensionandroidapp.utility.Direction;
+import net.sh4869.extensionandroidapp.view.customFontButton;
 import net.sh4869.extensionandroidapp.websokcetdata.ExAuthResultWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExAuthWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExCallResultWebSocketMessage;
@@ -41,7 +42,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
     private WebSocketClient mClient;
     private Handler mHandler;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         mHandler = new Handler() {
             @Override
@@ -152,34 +151,57 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
         }
+
+        // ------------------ Set Onclick Listener
+
+        this.findViewById(R.id.upButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendCameraServoMove(Direction.UP, 5);
+            }
+        });
+        this.findViewById(R.id.downButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendCameraServoMove(Direction.DOWN, 5);
+            }
+        });
+        this.findViewById(R.id.rightButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendCameraServoMove(Direction.RIGHT, 5);
+            }
+        });
+        this.findViewById(R.id.leftButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendCameraServoMove(Direction.LEFT, 5);
+            }
+        });
     }
 
     private void messageParser(String message) {
         Gson gson = new Gson();
         ExWebSocketMessage wsMessage = gson.fromJson(message, ExWebSocketMessage.class);
-        try {
-            switch (wsMessage.type) {
-                case "webAuth":
-                    ExAuthResultWebSocketMessage authReturnMessage = gson.fromJson(message, ExAuthResultWebSocketMessage.class);
-                    checkAuthResult(authReturnMessage);
-                    break;
-                case "list":
-                    ExChildListMessage childMessage = new ExChildListMessage(message);
-                    checkChildListResult(childMessage);
-                    break;
-                case "call":
-                    ExCallResultWebSocketMessage callResultMessage = new ExCallResultWebSocketMessage(message);
-                    checkCallResult(callResultMessage);
-                    break;
-                case "result":
-                    ExFunctionResultWebSocketMessage functionResultMessage = new ExFunctionResultWebSocketMessage(message);
-                    checkFunctionResult(functionResultMessage);
-                    break;
-                default:
-                    break;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        switch (wsMessage.type) {
+            case "webAuth":
+                ExAuthResultWebSocketMessage authReturnMessage = gson.fromJson(message, ExAuthResultWebSocketMessage.class);
+                checkAuthResult(authReturnMessage);
+                break;
+            case "list":
+                ExChildListMessage childMessage = new ExChildListMessage(message);
+                checkChildListResult(childMessage);
+                break;
+            case "call":
+                ExCallResultWebSocketMessage callResultMessage = new ExCallResultWebSocketMessage(message);
+                checkCallResult(callResultMessage);
+                break;
+            case "result":
+                ExFunctionResultWebSocketMessage functionResultMessage = new ExFunctionResultWebSocketMessage(message);
+                checkFunctionResult(functionResultMessage);
+                break;
+            default:
+                break;
         }
     }
 
@@ -202,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
         message.what = whatCode;
         return message;
     }
+
 
     // ----------------------- * Web Auth * --------------------------------//
 
@@ -237,7 +260,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     /// Check Result of Login
     private void checkAuthResult(ExAuthResultWebSocketMessage authResultMessage) {
         if (authResultMessage.authResult()) {
@@ -258,11 +280,7 @@ public class MainActivity extends AppCompatActivity {
     /// Send Child Rist Request
     private void sendChildListRequest() {
         ExWebSocketMessage wsMessage = new ExWebSocketMessage("list", null);
-        try {
-            mClient.send(wsMessage.toString());
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        }
+        mClient.send(wsMessage.toString());
     }
 
     private void checkChildListResult(ExChildListMessage message) {
@@ -346,6 +364,12 @@ public class MainActivity extends AppCompatActivity {
         if (message.value.hasError) {
             Message handlerMessage = createMessage(HandlerMessage.FUNCTION_FAIL, HandlerMessage.FUNCTION_FAIL.codeNumber());
             mHandler.sendMessage(handlerMessage);
+        } else {
+            if (message.value.functionName.equals("angleX")) {
+                xAngle = (Integer) message.value.result;
+            } else if (message.value.functionName.equals("angleY")) {
+                yAngle = (Integer) message.value.result;
+            }
         }
     }
 
