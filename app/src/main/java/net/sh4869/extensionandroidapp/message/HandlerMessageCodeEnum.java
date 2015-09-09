@@ -10,7 +10,8 @@ public enum HandlerMessageCodeEnum {
     LOGIN_FAILED(2,"Login Failed"),
     CHILD_FOUND(3,"Target Child is found"),
     CHILD_FOUND_MULTIPLE(4,"Target Children are found"),
-    CHILD_NOT_FOUND(5,"Target Children not fount");
+    CHILD_NOT_FOUND(5,"Target Children not fount"),
+    CALL_FAIL(6,"fail to call function");
 
     private String message;
     final private int codeNumber;

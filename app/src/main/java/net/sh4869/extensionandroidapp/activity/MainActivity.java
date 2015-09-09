@@ -21,8 +21,11 @@ import com.google.gson.JsonParser;
 
 import net.sh4869.extensionandroidapp.R;
 import net.sh4869.extensionandroidapp.message.HandlerMessageCodeEnum;
+import net.sh4869.extensionandroidapp.utility.DirectionEnum;
 import net.sh4869.extensionandroidapp.websokcetdata.ExAuthResultWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExAuthWebSocketMessage;
+import net.sh4869.extensionandroidapp.websokcetdata.ExCallResultWebSocketMessage;
+import net.sh4869.extensionandroidapp.websokcetdata.ExCallWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChild;
 import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildFinder;
 import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildren;
@@ -39,6 +42,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +55,12 @@ public class MainActivity extends AppCompatActivity {
     // name of data
     private final String FILENAME = "userdata.json";
 
-    private  String cameraChildGUID;
+    // GUID of Cmaera Client
+    private String cameraChildGUID;
+
+    // Value of Camera Child Servo Value
+    private int xAngle = 90;
+    private int yAngle = 90;
 
     private WebSocketClient mClient;
     private Handler mHandler;
@@ -66,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.login_success), Toast.LENGTH_SHORT).show();
                         break;
                     case LOGIN_FAILED: // LOGIN FAIL
-                        Toast.makeText(MainActivity.this,getResources().getString(R.string.login_fail),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.login_fail), Toast.LENGTH_SHORT).show();
                         new AlertDialog.Builder(MainActivity.this)
                                 .setTitle("Error")
                                 .setMessage("message: " + (String) message.obj)
@@ -74,16 +83,21 @@ public class MainActivity extends AppCompatActivity {
                                 .show();
                         break;
                     case CHILD_FOUND:
-                        Log.d(ACTIVITY_TAG,getResources().getString(R.string.child_found));
-                        Toast.makeText(MainActivity.this,getResources().getString(R.string.child_found),Toast.LENGTH_SHORT).show();
+                        Log.d(ACTIVITY_TAG, getResources().getString(R.string.child_found));
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.child_found), Toast.LENGTH_SHORT).show();
                         break;
                     case CHILD_FOUND_MULTIPLE:
-                        Log.d(ACTIVITY_TAG,getResources().getString(R.string.child_found_multiple));
-                        Toast.makeText(MainActivity.this,getResources().getString(R.string.child_found_multiple),Toast.LENGTH_SHORT).show();
+                        Log.d(ACTIVITY_TAG, getResources().getString(R.string.child_found_multiple));
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.child_found_multiple), Toast.LENGTH_SHORT).show();
+                        // TODO: 2015/09/10 複数のカメラ子機がある場合どうするかという話
                         break;
                     case CHILD_NOT_FOUND:
-                        Log.d(ACTIVITY_TAG,getResources().getString(R.string.child_not_found));
-                        Toast.makeText(MainActivity.this,getResources().getString(R.string.child_not_found),Toast.LENGTH_SHORT).show();
+                        Log.d(ACTIVITY_TAG, getResources().getString(R.string.child_not_found));
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.child_not_found), Toast.LENGTH_SHORT).show();
+                    case CALL_FAIL:
+                        Log.d(ACTIVITY_TAG, getResources().getString(R.string.fail_to_call_function));
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.fail_to_call_function), Toast.LENGTH_SHORT).show();
+                        break;
                 }
             }
         };
@@ -149,6 +163,10 @@ public class MainActivity extends AppCompatActivity {
                     ExChildListMessage childMessage = new ExChildListMessage(message);
                     checkChildListResult(childMessage);
                     break;
+                case "call":
+                    ExCallResultWebSocketMessage callResultMessage = new ExCallResultWebSocketMessage(message);
+                    checkCallResult(callResultMessage);
+                    break;
                 default:
                     break;
             }
@@ -197,9 +215,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (NotYetConnectedException e) {
                     e.printStackTrace();
                 }
-            } catch (JsonParseException e) {
-                e.printStackTrace();
-                sendsuccess = false;
             } catch (IllegalStateException e) {
                 e.printStackTrace();
                 sendsuccess = false;
@@ -252,26 +267,82 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    //// TODO: 2015/09/07
     private void checkChildListResult(ExChildListMessage message) {
         ExChildren children = ExChildFinder.searchChildren(message, "Camera");
-        List<String> guidList = new ArrayList<String>();
-        Log.d(ACTIVITY_TAG,"Children Number : " + children.commands.size());
+        List<String> guidList = new ArrayList<>();
         for (Map.Entry<String, ExChild> child : children) {
-            Log.d(ACTIVITY_TAG,"child guid : " + child.getKey());
             guidList.add(child.getKey());
         }
         Message messageData;
-        if (guidList.size() == 1) {
-            messageData = createMessage(HandlerMessageCodeEnum.CHILD_FOUND, HandlerMessageCodeEnum.CHILD_FOUND.codeNumber());
-        } else if (guidList.size() == 0) {
-            messageData = createMessage(HandlerMessageCodeEnum.CHILD_NOT_FOUND, HandlerMessageCodeEnum.CHILD_NOT_FOUND.codeNumber());
-        } else {
-            messageData = createMessage(HandlerMessageCodeEnum.CHILD_FOUND_MULTIPLE, HandlerMessageCodeEnum.CHILD_FOUND_MULTIPLE.codeNumber());
+        switch (guidList.size()) {
+            case 1:
+                messageData = createMessage(HandlerMessageCodeEnum.CHILD_FOUND, HandlerMessageCodeEnum.CHILD_FOUND.codeNumber());
+                cameraChildGUID = guidList.get(guidList.size() - 1);
+                break;
+            case 0:
+                messageData = createMessage(HandlerMessageCodeEnum.CHILD_NOT_FOUND, HandlerMessageCodeEnum.CHILD_NOT_FOUND.codeNumber());
+                break;
+            default:
+                messageData = createMessage(HandlerMessageCodeEnum.CHILD_FOUND_MULTIPLE, HandlerMessageCodeEnum.CHILD_FOUND_MULTIPLE.codeNumber());
+
         }
         mHandler.sendMessage(messageData);
     }
+
+    // -------------------------- Call  ------------------------//
+
+    /**
+     * Call Camera Child Servo Movement
+     *
+     * @param direction direction
+     * @param value     angle value
+     */
+    public void sendCameraServoMove(DirectionEnum direction, int value) {
+        String funcName = "";
+        int angle = 90;
+        switch (direction) {
+            case UP:
+                funcName = "angleY";
+                angle = yAngle + value;
+                break;
+            case DOWN:
+                funcName = "angleY";
+                angle = yAngle - value;
+                break;
+            case RIGHT:
+                funcName = "angleX";
+                angle = xAngle + value;
+                break;
+            case LEFT:
+                funcName = "angleX";
+                angle = xAngle - value;
+                break;
+            default:
+                break;
+        }
+        Map<String, Object> args = new HashMap<>();
+        args.put("angle", angle);
+        ExCallWebSocketMessage callMessage = new ExCallWebSocketMessage(cameraChildGUID, funcName, args);
+        sendCallMessage(callMessage);
+    }
+
+    /**
+     * Call Request
+     *
+     * @param callMessage callmessage class that you want to send
+     */
+    private void sendCallMessage(ExCallWebSocketMessage callMessage) {
+        mClient.send(callMessage.toString());
+    }
+
+    private void checkCallResult(ExCallResultWebSocketMessage message) {
+        if (!message.getCallResult()) {
+            Message sendHndleMessage = createMessage(HandlerMessageCodeEnum.CALL_FAIL, HandlerMessageCodeEnum.CALL_FAIL.codeNumber());
+            mHandler.sendMessage(sendHndleMessage);
+        }
+    }
+
+    // ------------------------ Check Result of Function --------------------
 
 
     @Override
