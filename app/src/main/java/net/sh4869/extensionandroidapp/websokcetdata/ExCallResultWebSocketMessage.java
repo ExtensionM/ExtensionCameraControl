@@ -22,7 +22,7 @@ public class ExCallResultWebSocketMessage extends ExBaseWebSocketMessage {
         try {
             JsonObject valueObject = parser.parse(jsonString).getAsJsonObject().getAsJsonObject("value");
             this.value.put("result", valueObject.get("result").getAsInt());
-            if (this.value.get("result") == 0) {
+            if ((Integer)this.value.get("result") == 0) {
                 this.value.put("commands", valueObject.get("commands"));
             } else {
                 this.value.put("error", valueObject.get("error"));
@@ -35,7 +35,7 @@ public class ExCallResultWebSocketMessage extends ExBaseWebSocketMessage {
     // get Call Function Reuslt
     public boolean getCallResult() {
         if (this.value.containsKey("result")) {
-            if ((Double) this.value.get("result") == 0) {
+            if ((Integer) this.value.get("result") == 0) {
                 return true;
             } else {
                 return false;
