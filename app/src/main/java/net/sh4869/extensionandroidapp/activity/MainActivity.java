@@ -2,15 +2,19 @@ package net.sh4869.extensionandroidapp.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -30,6 +34,7 @@ import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildFinder;
 import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildren;
 import net.sh4869.extensionandroidapp.websokcetdata.ExChildListMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExFunctionResultWebSocketMessage;
+import net.sh4869.extensionandroidapp.websokcetdata.ExMessageWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExWebSocketMessage;
 
 import org.java_websocket.client.WebSocketClient;
@@ -40,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +70,9 @@ public class MainActivity extends AppCompatActivity {
     // Display Message
     private String displayMessage;
 
+    // Display Image
+    private Bitmap imageBitmap;
+
     private WebSocketClient mClient;
     private Handler mHandler;
 
@@ -73,7 +82,8 @@ public class MainActivity extends AppCompatActivity {
             public void handleMessage(Message message) {
                 StringBuilder sBuilder = new StringBuilder();
                 int messageStringId = R.string.default_message;
-                if(((HandlerMessage)message.obj).haveAddMessage){
+                boolean pushToast = true;
+                if (((HandlerMessage) message.obj).haveAddMessage) {
                     sBuilder.append("\n" + displayMessage);
                 }
                 switch ((HandlerMessage) message.obj) {
@@ -99,10 +109,17 @@ public class MainActivity extends AppCompatActivity {
                     case FUNCTION_FAIL:
                         messageStringId = R.string.fail_to_complete_function;
                         break;
+                    case CHANGE_IMAGE:
+                        ((ImageView)findViewById(R.id.imageView)).setImageBitmap(imageBitmap);
+                        pushToast = false;
+                        break;
                 }
+
                 Log.d(ACTIVITY_TAG, getResources().getString(messageStringId));
-                String displayString = new String(sBuilder.insert(0,getResources().getString(messageStringId)));
-                Toast.makeText(MainActivity.this, displayString, Toast.LENGTH_SHORT).show();
+                if (pushToast) {
+                    String displayString = new String(sBuilder.insert(0, getResources().getString(messageStringId)));
+                    Toast.makeText(MainActivity.this, displayString, Toast.LENGTH_SHORT).show();
+                }
             }
         };
         super.onCreate(savedInstanceState);
@@ -161,22 +178,32 @@ public class MainActivity extends AppCompatActivity {
                 sendCameraServoMove(Direction.UP, 5);
             }
         });
+
         this.findViewById(R.id.downButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendCameraServoMove(Direction.DOWN, 5);
             }
         });
+
         this.findViewById(R.id.rightButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendCameraServoMove(Direction.RIGHT, 5);
             }
         });
+
         this.findViewById(R.id.leftButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendCameraServoMove(Direction.LEFT, 5);
+            }
+        });
+
+        this.findViewById(R.id.takeButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendTakeFunction();
             }
         });
     }
@@ -201,6 +228,10 @@ public class MainActivity extends AppCompatActivity {
             case "result":
                 ExFunctionResultWebSocketMessage functionResultMessage = new ExFunctionResultWebSocketMessage(message);
                 checkFunctionResult(functionResultMessage);
+                break;
+            case "message":
+                ExMessageWebSocketMessage messageResultMessage = new ExMessageWebSocketMessage(message);
+                chekcFunctionMessage(messageResultMessage);
                 break;
             default:
                 break;
@@ -241,7 +272,12 @@ public class MainActivity extends AppCompatActivity {
                 String username = userDataObject.get("username").toString().replace("\"", "");
                 String password = userDataObject.get("password").toString().replace("\"", "");
                 ExAuthWebSocketMessage authWSMessage = new ExAuthWebSocketMessage(username, password);
-                mClient.send(authWSMessage.toString());
+                try {
+                    mClient.send(authWSMessage.toString());
+                } catch (NotYetConnectedException e) {
+                    e.printStackTrace();
+                    mClient.connect();
+                }
             } catch (JsonParseException e) {
                 e.printStackTrace();
                 sendsuccess = false;
@@ -276,11 +312,16 @@ public class MainActivity extends AppCompatActivity {
     /// Send Child Rist Request
     private void sendChildListRequest() {
         ExWebSocketMessage wsMessage = new ExWebSocketMessage("list", null);
-        mClient.send(wsMessage.toString());
+        try {
+            mClient.send(wsMessage.toString());
+        } catch (NotYetConnectedException e) {
+            e.printStackTrace();
+            mClient.connect();
+        }
     }
 
     private void checkChildListResult(ExChildListMessage message) {
-        ExChildren children = ExChildFinder.searchChildren(message, "Camera");
+        ExChildren children = ExChildFinder.searchChildren(message, "CameraSimple");
         List<String> guidList = new ArrayList<>();
         for (Map.Entry<String, ExChild> child : children) {
             guidList.add(child.getKey());
@@ -338,13 +379,23 @@ public class MainActivity extends AppCompatActivity {
         sendCallMessage(callMessage);
     }
 
+    private void sendTakeFunction() {
+        ExCallWebSocketMessage callMessage = new ExCallWebSocketMessage(cameraChildGUID, "take", null);
+        sendCallMessage(callMessage);
+    }
+
     /**
      * Call Request
      *
      * @param callMessage callmessage class that you want to send
      */
     private void sendCallMessage(ExCallWebSocketMessage callMessage) {
-        mClient.send(callMessage.toString());
+        try {
+            mClient.send(callMessage.toString());
+        } catch (NotYetConnectedException e) {
+            e.printStackTrace();
+            mClient.connect();
+        }
     }
 
     private void checkCallResult(ExCallResultWebSocketMessage message) {
@@ -359,8 +410,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkFunctionResult(ExFunctionResultWebSocketMessage message) {
         if (message.value.hasError) {
-            Message handlerMessage = createMessage(HandlerMessage.FUNCTION_FAIL, false);
+            displayMessage = message.value.error.message;
+            Message handlerMessage = createMessage(HandlerMessage.FUNCTION_FAIL, true);
             mHandler.sendMessage(handlerMessage);
+            Log.d(ACTIVITY_TAG, new Gson().toJson(message.value));
         } else {
             if (message.value.functionName.equals("angleX")) {
                 xAngle = (Integer) message.value.result;
@@ -370,6 +423,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // ----------------- Check Message ---------------------------
+
+    private void chekcFunctionMessage(ExMessageWebSocketMessage message) {
+        if (message.getResult()) {
+            Log.d(ACTIVITY_TAG, message.getData().data.toString());
+
+            byte[] image_src = Base64.decode(((String) message.getData().data).replace("data:image/jpeg;base64,", ""), Base64.DEFAULT);
+            imageBitmap = BitmapFactory.decodeByteArray(image_src, 0, image_src.length);
+            Message sendhandlerMessage = createMessage(HandlerMessage.CHANGE_IMAGE,false);
+            mHandler.sendMessage(sendhandlerMessage);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

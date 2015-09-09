@@ -12,5 +12,6 @@
     <string name="right_button_text">&#xf178;</string>
     <string name="left_button_text">&#xf177;</string>
     <string name="take_button_text">&#xf030;</string>
+    <string name="image_view_desc">camera_image_view</string>
 
 </resources>
