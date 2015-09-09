@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="login_success">Login Complete!</string>
+    <string name="login_fail">Login Failed...</string>
+    <string name="child_found">Found Camera Child</string>
+    <string name="child_not_found">Not Found Camera Child</string>
+    <string name="child_found_multiple">Found Camera Children</string>
 </resources>
