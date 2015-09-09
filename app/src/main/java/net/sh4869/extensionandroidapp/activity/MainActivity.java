@@ -1,6 +1,5 @@
 package net.sh4869.extensionandroidapp.activity;
 
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -22,7 +21,6 @@ import com.google.gson.JsonParser;
 import net.sh4869.extensionandroidapp.R;
 import net.sh4869.extensionandroidapp.message.HandlerMessage;
 import net.sh4869.extensionandroidapp.utility.Direction;
-import net.sh4869.extensionandroidapp.view.customFontButton;
 import net.sh4869.extensionandroidapp.websokcetdata.ExAuthResultWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExAuthWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExCallResultWebSocketMessage;
@@ -183,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Parse Message from WebSocket
     private void messageParser(String message) {
         Gson gson = new Gson();
         ExWebSocketMessage wsMessage = gson.fromJson(message, ExWebSocketMessage.class);
@@ -208,15 +207,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /// Onclick Lisnter for Dialog
-    DialogInterface.OnClickListener errorDialogButton = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            callLoginAcitivty();
-        }
-    };
 
-    private void callLoginAcitivty() {
+    private void callLoginActivity() {
         Intent intent = new Intent(getApplication(), LoginActivity.class);
         startActivity(intent);
     }
@@ -259,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
             sendsuccess = false;
         }
         if (!sendsuccess) {
-            callLoginAcitivty();
+            callLoginActivity();
         }
     }
 
