@@ -24,7 +24,7 @@ public class ExChildFunctionResult {
     /**
      * Error Object
      */
-    public Object error;
+    public ExChildFunctionResultError error;
 
     /**
      * result of Function
