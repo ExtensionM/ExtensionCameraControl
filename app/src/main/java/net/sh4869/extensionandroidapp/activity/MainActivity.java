@@ -63,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
     private int xAngle = 90;
     private int yAngle = 90;
 
+    // Display Message
+    private String displayMessage;
+
     private WebSocketClient mClient;
     private Handler mHandler;
 
@@ -70,38 +73,38 @@ public class MainActivity extends AppCompatActivity {
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
+                StringBuilder sBuilder = new StringBuilder();
+                int messageStringId = R.string.default_message;
+                if(((HandlerMessage)message.obj).haveAddMessage){
+                    sBuilder.append("\n" + displayMessage);
+                }
                 switch ((HandlerMessage) message.obj) {
                     case LOGIN_SUCCESS: // LOGIN SUCCESS
-                        Toast.makeText(MainActivity.this, getResources().getString(R.string.login_success), Toast.LENGTH_SHORT).show();
+                        messageStringId = R.string.login_success;
                         break;
                     case LOGIN_FAILED: // LOGIN FAIL
-                        Toast.makeText(MainActivity.this, getResources().getString(R.string.login_fail), Toast.LENGTH_SHORT).show();
-                        new AlertDialog.Builder(MainActivity.this)
-                                .setTitle("Error")
-                                .setMessage("message: " + (String) message.obj)
-                                .setPositiveButton("OK", errorDialogButton)
-                                .show();
+                        messageStringId = R.string.login_fail;
                         break;
                     case CHILD_FOUND:
-                        Log.d(ACTIVITY_TAG, getResources().getString(R.string.child_found));
-                        Toast.makeText(MainActivity.this, getResources().getString(R.string.child_found), Toast.LENGTH_SHORT).show();
+                        messageStringId = R.string.child_found;
                         break;
                     case CHILD_FOUND_MULTIPLE:
-                        Log.d(ACTIVITY_TAG, getResources().getString(R.string.child_found_multiple));
-                        Toast.makeText(MainActivity.this, getResources().getString(R.string.child_found_multiple), Toast.LENGTH_SHORT).show();
+                        messageStringId = R.string.child_found_multiple;
                         // TODO: 2015/09/10 複数のカメラ子機がある場合どうするかという話
                         break;
                     case CHILD_NOT_FOUND:
-                        Log.d(ACTIVITY_TAG, getResources().getString(R.string.child_not_found));
-                        Toast.makeText(MainActivity.this, getResources().getString(R.string.child_not_found), Toast.LENGTH_SHORT).show();
+                        messageStringId = R.string.child_not_found;
+                        break;
                     case CALL_FAIL:
-                        Log.d(ACTIVITY_TAG, getResources().getString(R.string.fail_to_call_function));
-                        Toast.makeText(MainActivity.this, getResources().getString(R.string.fail_to_call_function), Toast.LENGTH_SHORT).show();
+                        messageStringId = R.string.fail_to_call_function;
                         break;
                     case FUNCTION_FAIL:
-                        Log.d(ACTIVITY_TAG, getResources().getString(R.string.fail_to_complete_function));
-                        Toast.makeText(MainActivity.this, getResources().getString(R.string.fail_to_call_function), Toast.LENGTH_SHORT).show();
+                        messageStringId = R.string.fail_to_complete_function;
+                        break;
                 }
+                Log.d(ACTIVITY_TAG, getResources().getString(messageStringId));
+                String displayString = new String(sBuilder.insert(0,getResources().getString(messageStringId)));
+                Toast.makeText(MainActivity.this, displayString, Toast.LENGTH_SHORT).show();
             }
         };
         super.onCreate(savedInstanceState);
@@ -218,10 +221,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    Message createMessage(HandlerMessage messageCode, int whatCode) {
+    Message createMessage(HandlerMessage messageCode, boolean isAddMessage) {
         Message message = Message.obtain();
+        messageCode.haveAddMessage = isAddMessage;
         message.obj = messageCode;
-        message.what = whatCode;
         return message;
     }
 
@@ -265,11 +268,12 @@ public class MainActivity extends AppCompatActivity {
         if (authResultMessage.authResult()) {
             Log.d(WSTAG, "Result Success");
             sendChildListRequest();
-            Message resultMessage = createMessage(HandlerMessage.LOGIN_SUCCESS, HandlerMessage.LOGIN_SUCCESS.codeNumber());
+            Message resultMessage = createMessage(HandlerMessage.LOGIN_SUCCESS, false);
             mHandler.sendMessage(resultMessage);
         } else {
             Log.d(WSTAG, "Auth Result Fail");
-            Message resultMessage = createMessage(HandlerMessage.LOGIN_FAILED, HandlerMessage.LOGIN_FAILED.codeNumber());
+            displayMessage = authResultMessage.getErrorMessage();
+            Message resultMessage = createMessage(HandlerMessage.LOGIN_FAILED, true);
             mHandler.sendMessage(resultMessage);
         }
     }
@@ -292,14 +296,14 @@ public class MainActivity extends AppCompatActivity {
         Message messageData;
         switch (guidList.size()) {
             case 1:
-                messageData = createMessage(HandlerMessage.CHILD_FOUND, HandlerMessage.CHILD_FOUND.codeNumber());
+                messageData = createMessage(HandlerMessage.CHILD_FOUND, false);
                 cameraChildGUID = guidList.get(guidList.size() - 1);
                 break;
             case 0:
-                messageData = createMessage(HandlerMessage.CHILD_NOT_FOUND, HandlerMessage.CHILD_NOT_FOUND.codeNumber());
+                messageData = createMessage(HandlerMessage.CHILD_NOT_FOUND, false);
                 break;
             default:
-                messageData = createMessage(HandlerMessage.CHILD_FOUND_MULTIPLE, HandlerMessage.CHILD_FOUND_MULTIPLE.codeNumber());
+                messageData = createMessage(HandlerMessage.CHILD_FOUND_MULTIPLE, false);
 
         }
         mHandler.sendMessage(messageData);
@@ -353,8 +357,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkCallResult(ExCallResultWebSocketMessage message) {
         if (!message.getCallResult()) {
-            Message sendHndleMessage = createMessage(HandlerMessage.CALL_FAIL, HandlerMessage.CALL_FAIL.codeNumber());
-            mHandler.sendMessage(sendHndleMessage);
+            displayMessage = message.getErrorMessage();
+            Message sendHndlerMessage = createMessage(HandlerMessage.CALL_FAIL, true);
+            mHandler.sendMessage(sendHndlerMessage);
         }
     }
 
@@ -362,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkFunctionResult(ExFunctionResultWebSocketMessage message) {
         if (message.value.hasError) {
-            Message handlerMessage = createMessage(HandlerMessage.FUNCTION_FAIL, HandlerMessage.FUNCTION_FAIL.codeNumber());
+            Message handlerMessage = createMessage(HandlerMessage.FUNCTION_FAIL, false);
             mHandler.sendMessage(handlerMessage);
         } else {
             if (message.value.functionName.equals("angleX")) {

@@ -10,12 +10,15 @@ public enum HandlerMessage {
     CHILD_FOUND_MULTIPLE(4, "Target Children are found"),
     CHILD_NOT_FOUND(5, "Target Children not fount"),
     CALL_FAIL(6, "fail to call function"),
-    FUNCTION_FAIL(7, "fail to do function");
+    FUNCTION_FAIL(7, "fail to do function"),
+    DISPLAY_MESSAGE(8,"");
+
+    public boolean haveAddMessage;
 
     private String message;
     final private int codeNumber;
 
-    private HandlerMessage(int num, String message) {
+    HandlerMessage(int num, String message) {
         this.codeNumber = num;
         this.message = message;
     }
@@ -26,5 +29,9 @@ public enum HandlerMessage {
 
     public String message() {
         return this.message;
+    }
+
+    public boolean haveAddMessage(){
+        return this.haveAddMessage;
     }
 }
