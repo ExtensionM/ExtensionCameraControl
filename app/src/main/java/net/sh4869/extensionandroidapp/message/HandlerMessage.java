@@ -11,7 +11,8 @@ public enum HandlerMessage {
     CHILD_NOT_FOUND(5, "Target Children not fount"),
     CALL_FAIL(6, "fail to call function"),
     FUNCTION_FAIL(7, "fail to do function"),
-    CHANGE_IMAGE(8,"change image");
+    CHANGE_IMAGE(8,"change image"),
+    LOGOUT(9,"logout");
 
 
     public boolean haveAddMessage;

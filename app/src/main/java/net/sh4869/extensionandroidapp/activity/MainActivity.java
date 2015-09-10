@@ -76,6 +76,9 @@ public class MainActivity extends AppCompatActivity {
     private WebSocketClient mClient;
     private Handler mHandler;
 
+    // Menu itemId
+    public static final int MENU_LOGOUT = 0;
+
     protected void onCreate(Bundle savedInstanceState) {
         mHandler = new Handler() {
             @Override
@@ -110,8 +113,12 @@ public class MainActivity extends AppCompatActivity {
                         messageStringId = R.string.fail_to_complete_function;
                         break;
                     case CHANGE_IMAGE:
-                        ((ImageView)findViewById(R.id.imageView)).setImageBitmap(imageBitmap);
+                        ((ImageView) findViewById(R.id.imageView)).setImageBitmap(imageBitmap);
                         pushToast = false;
+                        break;
+                    case LOGOUT:
+                        messageStringId = R.string.menu_logout;
+                        callLoginActivity();
                         break;
                 }
 
@@ -431,7 +438,7 @@ public class MainActivity extends AppCompatActivity {
 
             byte[] image_src = Base64.decode(((String) message.getData().data).replace("data:image/jpeg;base64,", ""), Base64.DEFAULT);
             imageBitmap = BitmapFactory.decodeByteArray(image_src, 0, image_src.length);
-            Message sendhandlerMessage = createMessage(HandlerMessage.CHANGE_IMAGE,false);
+            Message sendhandlerMessage = createMessage(HandlerMessage.CHANGE_IMAGE, false);
             mHandler.sendMessage(sendhandlerMessage);
         }
     }
@@ -440,6 +447,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
@@ -451,8 +459,12 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                return true;
+            case R.id.menu_logout:
+                callLoginActivity();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

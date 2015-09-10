@@ -4,4 +4,6 @@
     tools:context="net.sh4869.extensionandroidapp.activity.MainActivity">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/menu_logout" android:title="@string/menu_logout"
+        android:orderInCategory="1000" app:showAsAction="never" />
 </menu>
