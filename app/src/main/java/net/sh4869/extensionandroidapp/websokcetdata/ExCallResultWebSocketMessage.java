@@ -1,6 +1,5 @@
 package net.sh4869.extensionandroidapp.websokcetdata;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -22,7 +21,7 @@ public class ExCallResultWebSocketMessage extends ExBaseWebSocketMessage {
         try {
             JsonObject valueObject = parser.parse(jsonString).getAsJsonObject().getAsJsonObject("value");
             this.value.put("result", valueObject.get("result").getAsInt());
-            if ((Integer)this.value.get("result") == 0) {
+            if ((Integer) this.value.get("result") == 0) {
                 this.value.put("commands", valueObject.get("commands"));
             } else {
                 this.value.put("error", valueObject.get("error"));

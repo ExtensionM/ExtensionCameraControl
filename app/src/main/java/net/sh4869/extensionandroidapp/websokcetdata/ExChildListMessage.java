@@ -30,7 +30,7 @@ public class ExChildListMessage extends ExBaseWebSocketMessage {
         try {
             JsonObject valueObject = parser.parse(message).getAsJsonObject().getAsJsonObject("value");
             this.value.put("result", valueObject.get("result").getAsInt());
-            if (((int)this.value.get("result")) == 0) {
+            if (((int) this.value.get("result")) == 0) {
                 JsonObject commandsObject = valueObject.get("commands").getAsJsonObject();
                 Set<Map.Entry<String, JsonElement>> entrySet = commandsObject.entrySet();
                 JsonObject fixedCommandsObject = new JsonObject();
@@ -40,7 +40,7 @@ public class ExChildListMessage extends ExBaseWebSocketMessage {
                 for (Map.Entry<String, JsonElement> entry : entrySet) {
                     try {
                         if (entry.getValue().getAsJsonObject().has("name")) {
-                            fixedCommandsObject.add(entry.getKey(),entry.getValue());
+                            fixedCommandsObject.add(entry.getKey(), entry.getValue());
                         }
                     } catch (IllegalStateException e) {
                         /// Reomve Object that don't have name or can't get as JsonObject
@@ -51,12 +51,12 @@ public class ExChildListMessage extends ExBaseWebSocketMessage {
                 finalJsonObject.add("commands", fixedCommandsObject);
                 try {
                     ExChildren exChildren = gson.fromJson(finalJsonObject, ExChildren.class);
-                    this.value.put("commands",exChildren);
+                    this.value.put("commands", exChildren);
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
             } else {
-                this.value.put("error",valueObject.get("error").getAsString());
+                this.value.put("error", valueObject.get("error").getAsString());
             }
         } catch (JsonParseException e) {
             Log.d("JsonParse", e.getMessage());

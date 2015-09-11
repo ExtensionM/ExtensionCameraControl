@@ -8,9 +8,10 @@ import java.util.Map;
 
 /**
  * Interface of IterableMap
- * @author sh4869
+ *
  * @param <K>
  * @param <V>
+ * @author sh4869
  */
-public interface IterableMap<K,V> extends Iterable<Map.Entry<K, V>> {
+public interface IterableMap<K, V> extends Iterable<Map.Entry<K, V>> {
 }

@@ -6,8 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildFunction;
-import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildFunctionResult;
 import net.sh4869.extensionandroidapp.websokcetdata.ExChild.ExChildFunctionResultData;
 
 import java.util.HashMap;
@@ -34,12 +32,12 @@ public class ExMessageWebSocketMessage extends ExBaseWebSocketMessage {
         }
     }
 
-    public ExChildFunctionResultData getData(){
-        return (ExChildFunctionResultData)this.value.get("data");
+    public ExChildFunctionResultData getData() {
+        return (ExChildFunctionResultData) this.value.get("data");
     }
 
-    public boolean getResult(){
-        if((Integer)this.value.get("result") == 0){
+    public boolean getResult() {
+        if ((Integer) this.value.get("result") == 0) {
             return true;
         }
         return false;

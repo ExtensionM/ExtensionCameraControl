@@ -19,7 +19,9 @@ public class ExChildFunction {
     /// Permision of This Function
     public String perm;
 
-    /** Whether you can call this function or not */
+    /**
+     * Whether you can call this function or not
+     */
     public boolean status;
 
     /// Whether this function hope to call auto or not

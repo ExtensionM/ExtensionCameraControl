@@ -1,7 +1,5 @@
 package net.sh4869.extensionandroidapp.websokcetdata.ExChild;
 
-import java.util.Objects;
-
 /**
  * Created by Nobuhiro on 2015/09/10.
  */

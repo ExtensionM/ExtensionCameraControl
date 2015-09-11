@@ -6,6 +6,9 @@ package net.sh4869.extensionandroidapp.websokcetdata;
  */
 public abstract class ExBaseWebSocketMessage {
     public String type;
-    /** convert message to String */
+
+    /**
+     * convert message to String
+     */
     public abstract String toString();
 }

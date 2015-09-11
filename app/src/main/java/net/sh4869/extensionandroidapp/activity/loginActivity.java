@@ -3,18 +3,17 @@ package net.sh4869.extensionandroidapp.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -24,17 +23,14 @@ import net.sh4869.extensionandroidapp.websokcetdata.ExAuthResultWebSocketMessage
 import net.sh4869.extensionandroidapp.websokcetdata.ExAuthWebSocketMessage;
 import net.sh4869.extensionandroidapp.websokcetdata.ExWebSocketMessage;
 
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
+import org.java_websocket.handshake.ServerHandshake;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.channels.NotYetConnectedException;
-import java.util.logging.LogRecord;
-
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.exceptions.WebsocketNotConnectedException;
-import org.java_websocket.handshake.ServerHandshake;
-import org.w3c.dom.Text;
 
 public class LoginActivity extends AppCompatActivity {
     public static String WSTAG = "webSocket";
@@ -51,9 +47,9 @@ public class LoginActivity extends AppCompatActivity {
         deleteFile(FILENAME);
         mHandler = new Handler() {
             @Override
-            public void handleMessage(Message message){
-                ((TextView)findViewById(R.id.loginMessageTextView)).setText((String)message.obj);
-                ((TextView)findViewById(R.id.loginMessageTextView)).setTextColor(Color.RED);
+            public void handleMessage(Message message) {
+                ((TextView) findViewById(R.id.loginMessageTextView)).setText((String) message.obj);
+                ((TextView) findViewById(R.id.loginMessageTextView)).setTextColor(Color.RED);
             }
         };
         if ("sdk".equals(Build.PRODUCT)) {
@@ -133,7 +129,7 @@ public class LoginActivity extends AppCompatActivity {
                 mClient.send(sendText);
             } catch (IllegalStateException e) {
                 e.printStackTrace();
-            } catch (WebsocketNotConnectedException e){
+            } catch (WebsocketNotConnectedException e) {
                 e.printStackTrace();
                 mClient.connect();
             }

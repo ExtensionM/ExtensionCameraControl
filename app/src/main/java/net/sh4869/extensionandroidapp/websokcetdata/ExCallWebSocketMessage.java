@@ -12,19 +12,19 @@ import java.util.Map;
 public class ExCallWebSocketMessage extends ExBaseWebSocketMessage {
 
     // Message Value
-    public Map<String,Object> value = new HashMap<>();
+    public Map<String, Object> value = new HashMap<>();
 
-    public ExCallWebSocketMessage(String childId,String funcName,Map<String,Object> args){
+    public ExCallWebSocketMessage(String childId, String funcName, Map<String, Object> args) {
         this.type = "call";
-        this.value.put("id",childId);
-        this.value.put("func",funcName);
-        if(args != null){
+        this.value.put("id", childId);
+        this.value.put("func", funcName);
+        if (args != null) {
             this.value.putAll(args);
         }
     }
 
 
-    public String toString(){
+    public String toString() {
         Gson gson = new GsonBuilder().serializeNulls().create();
         return gson.toJson(this);
     }
