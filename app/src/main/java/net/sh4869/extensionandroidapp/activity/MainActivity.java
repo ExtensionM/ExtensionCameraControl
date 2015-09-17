@@ -1,5 +1,6 @@
 package net.sh4869.extensionandroidapp.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
@@ -52,31 +54,27 @@ import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
+    // Menu itemId
+    public static final int MENU_LOGOUT = 0;
     // TAG FOR WebSocket
     private final String WSTAG = "WebSocket";
     private final String ACTIVITY_TAG = "MainActivity";
-
     // name of data
     private final String FILENAME = "userdata.json";
-
     // GUID of Cmaera Client
     private String cameraChildGUID;
+    // guid list
+    private List<String> childList = new ArrayList<>();
 
     // Value of Camera Child Servo Value
     private int xAngle = 90;
     private int yAngle = 90;
-
     // Display Message
     private String displayMessage;
-
     // Display Image
     private Bitmap imageBitmap;
-
     private WebSocketClient mClient;
     private Handler mHandler;
-
-    // Menu itemId
-    public static final int MENU_LOGOUT = 0;
 
     protected void onCreate(Bundle savedInstanceState) {
         mHandler = new Handler() {
@@ -99,6 +97,15 @@ public class MainActivity extends AppCompatActivity {
                         messageStringId = R.string.child_found;
                         break;
                     case CHILD_FOUND_MULTIPLE:
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle("Select child you want")
+                                .setItems(childList.toArray(new String[0]),new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        cameraChildGUID = childList.toArray(new String[0])[which];
+                                    }
+                                })
+                                .show();
                         messageStringId = R.string.child_found_multiple;
                         // TODO: 2015/09/10 複数のカメラ子機がある場合どうするかという話
                         break;
@@ -342,8 +349,8 @@ public class MainActivity extends AppCompatActivity {
                 messageData = createMessage(HandlerMessage.CHILD_NOT_FOUND, false);
                 break;
             default:
+                childList.addAll(guidList);
                 messageData = createMessage(HandlerMessage.CHILD_FOUND_MULTIPLE, false);
-
         }
         mHandler.sendMessage(messageData);
     }

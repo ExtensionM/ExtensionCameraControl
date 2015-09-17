@@ -15,10 +15,9 @@ public enum HandlerMessage {
     LOGOUT(9, "logout");
 
 
-    public boolean haveAddMessage;
-
-    private String message;
     final private int codeNumber;
+    public boolean haveAddMessage;
+    private String message;
 
     HandlerMessage(int num, String message) {
         this.codeNumber = num;

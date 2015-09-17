@@ -8,9 +8,16 @@ import java.util.Map;
  */
 public class ExAuthResultWebSocketMessage extends ExBaseWebSocketMessage {
 
-    // Message Value
-    public Map value = new HashMap<String, Object>();
+    /**
+     * Value of Message
+     */
+    public Map<String,Object> value = new HashMap<String, Object>();
 
+    /**
+     * Default constructor
+     * @param result auth Result
+     * @param ErrorMessage Error Message of This Auth
+     */
     public ExAuthResultWebSocketMessage(int result, String ErrorMessage) {
         this.type = "webAuth";
         this.value.put("result", result);
@@ -19,10 +26,7 @@ public class ExAuthResultWebSocketMessage extends ExBaseWebSocketMessage {
 
     /// Return authResult
     public boolean authResult() {
-        if ((Double) this.value.get("result") == 0) {
-            return true;
-        }
-        return false;
+        return (Double) this.value.get("result") == 0;
     }
 
     /// Return Auth Error Message
